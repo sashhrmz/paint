@@ -44,14 +44,25 @@ public class Main extends Application {
         openButton.setText("Open");
         openButton.setMinWidth(300);
 
+        ToggleGroup selectedButtons = new ToggleGroup();
+        drawButton.setToggleGroup(selectedButtons);
+        eraserButton.setToggleGroup(selectedButtons);
+
         Canvas drawingArea = new Canvas(750, 500);
         GraphicsContext gc = drawingArea.getGraphicsContext2D();
-        gc.setLineWidth(1);
-        gc.setFill(Color.BLACK);
+        gc.setLineWidth(10);
 
+        StackPane drawingBackground = new StackPane(drawingArea);
+        BackgroundFill drawingAreaBackground = new BackgroundFill(Color.WHITE,
+                new CornerRadii(0), new Insets(0));
+        drawingBackground.setBackground(new Background(drawingAreaBackground));
         drawingArea.setOnMousePressed(e->{
             if (drawButton.isSelected()) {
-                gc.setFill(Color.BLACK);
+                gc.setStroke(Color.BLACK);
+                gc.beginPath();
+                gc.lineTo(e.getX(), e.getY());
+            } else if(eraserButton.isSelected()) {
+                gc.setStroke(Color.WHITE);
                 gc.beginPath();
                 gc.lineTo(e.getX(), e.getY());
             }
@@ -59,7 +70,11 @@ public class Main extends Application {
 
         drawingArea.setOnMouseDragged(e->{
             if(drawButton.isSelected()) {
-                gc.setFill(Color.BLACK);
+                gc.setStroke(Color.BLACK);
+                gc.lineTo(e.getX(), e.getY());
+                gc.stroke();
+            } else if(eraserButton.isSelected()) {
+                gc.setStroke(Color.WHITE);
                 gc.lineTo(e.getX(), e.getY());
                 gc.stroke();
             }
@@ -67,7 +82,12 @@ public class Main extends Application {
 
         drawingArea.setOnMouseReleased(e->{
             if(drawButton.isSelected()) {
-                gc.setFill(Color.BLACK);
+                gc.setStroke(Color.BLACK);
+                gc.lineTo(e.getX(), e.getY());
+                gc.stroke();
+                gc.closePath();
+            } else if(eraserButton.isSelected()) {
+                gc.setStroke(Color.WHITE);
                 gc.lineTo(e.getX(), e.getY());
                 gc.stroke();
                 gc.closePath();
@@ -101,7 +121,7 @@ public class Main extends Application {
         pane.setTop(paintButtons);
         pane.setLeft(leftLine);
         pane.setRight(rightLine);
-        pane.setCenter(drawingArea);
+        pane.setCenter(drawingBackground);
 
         Scene scene = new Scene(pane, 800, 600);
         primaryStage.setScene(scene);
