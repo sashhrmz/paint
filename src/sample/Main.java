@@ -29,19 +29,24 @@ public class Main extends Application {
 
         ToggleButton drawButton = new ToggleButton();
         drawButton.setText("Draw");
-        drawButton.setMinSize(300, 20);
+        drawButton.setMinSize(350, 20);
+        drawButton.setSelected(true);
 
         ToggleButton eraserButton = new ToggleButton();
         eraserButton.setText("Eraser");
-        eraserButton.setMinSize(300, 20);
+        eraserButton.setMinSize(350, 20);
+
+        Button clearButton = new Button();
+        clearButton.setText("Clear");
+        clearButton.setMinSize(240, 20);
 
         Button saveButton = new Button();
         saveButton.setText("Save");
-        saveButton.setMinSize(300, 20);
+        saveButton.setMinSize(240, 20);
 
         Button openButton = new Button();
         openButton.setText("Open");
-        openButton.setMinSize(300, 20);
+        openButton.setMinSize(240, 20);
 
         ToggleGroup selectedButtons = new ToggleGroup();
         drawButton.setToggleGroup(selectedButtons);
@@ -94,15 +99,15 @@ public class Main extends Application {
 
         TilePane tileButtons = new TilePane();
         tileButtons.setPadding(new Insets(10, 100, 10, 100));
-        tileButtons.setHgap(200);
+        tileButtons.setHgap(40);
         BackgroundFill backgroundFill = new BackgroundFill(Color.PINK, new CornerRadii(0),
                 new Insets(0));
         tileButtons.setBackground(new Background(backgroundFill));
-        tileButtons.getChildren().addAll(saveButton, openButton);
+        tileButtons.getChildren().addAll(clearButton, saveButton, openButton);
 
         TilePane paintButtons = new TilePane();
         paintButtons.setPadding(new Insets(10, 100, 10, 100));
-        paintButtons.setHgap(200);
+        paintButtons.setHgap(100);
         paintButtons.setBackground(new Background(backgroundFill));
         paintButtons.getChildren().addAll(drawButton, eraserButton);
 
@@ -113,6 +118,11 @@ public class Main extends Application {
         Pane rightLine = new Pane();
         rightLine.setMinWidth(100);
         rightLine.setBackground(new Background(backgroundFill));
+
+
+        clearButton.setOnAction((e)->{
+            gc.clearRect(0, 0, 800, 720);
+        });
 
         openButton.setOnAction((e)->{
 
