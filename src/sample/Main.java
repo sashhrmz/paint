@@ -1,25 +1,24 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.ArcType;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.shape.Line;
+import javax.imageio.ImageIO;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 public class Main extends Application {
@@ -30,25 +29,25 @@ public class Main extends Application {
 
         ToggleButton drawButton = new ToggleButton();
         drawButton.setText("Draw");
-        drawButton.setMinWidth(300);
+        drawButton.setMinSize(300, 20);
 
         ToggleButton eraserButton = new ToggleButton();
         eraserButton.setText("Eraser");
-        eraserButton.setMinWidth(300);
+        eraserButton.setMinSize(300, 20);
 
         Button saveButton = new Button();
         saveButton.setText("Save");
-        saveButton.setMinWidth(300);
+        saveButton.setMinSize(300, 20);
 
         Button openButton = new Button();
         openButton.setText("Open");
-        openButton.setMinWidth(300);
+        openButton.setMinSize(300, 20);
 
         ToggleGroup selectedButtons = new ToggleGroup();
         drawButton.setToggleGroup(selectedButtons);
         eraserButton.setToggleGroup(selectedButtons);
 
-        Canvas drawingArea = new Canvas(750, 500);
+        Canvas drawingArea = new Canvas(800, 720);
         GraphicsContext gc = drawingArea.getGraphicsContext2D();
         gc.setLineWidth(10);
 
@@ -94,27 +93,59 @@ public class Main extends Application {
             }});
 
         TilePane tileButtons = new TilePane();
-        tileButtons.setPadding(new Insets(10, 50, 10, 50));
-        tileButtons.setHgap(100);
+        tileButtons.setPadding(new Insets(10, 100, 10, 100));
+        tileButtons.setHgap(200);
         BackgroundFill backgroundFill = new BackgroundFill(Color.PINK, new CornerRadii(0),
                 new Insets(0));
         tileButtons.setBackground(new Background(backgroundFill));
         tileButtons.getChildren().addAll(saveButton, openButton);
 
         TilePane paintButtons = new TilePane();
-        paintButtons.setPadding(new Insets(10, 50, 10, 50));
-        paintButtons.setHgap(100);
+        paintButtons.setPadding(new Insets(10, 100, 10, 100));
+        paintButtons.setHgap(200);
         paintButtons.setBackground(new Background(backgroundFill));
         paintButtons.getChildren().addAll(drawButton, eraserButton);
 
-
         Pane leftLine = new Pane();
-        leftLine.setPadding(new Insets(10, 10, 10, 10));
+        leftLine.setMinWidth(100);
         leftLine.setBackground(new Background(backgroundFill));
 
         Pane rightLine = new Pane();
-        rightLine.setPadding(new Insets(10, 10, 10, 10));
+        rightLine.setMinWidth(100);
         rightLine.setBackground(new Background(backgroundFill));
+
+        openButton.setOnAction((e)->{
+
+            FileChooser openFile = new FileChooser();
+            openFile.setTitle("Open File");
+            File file = openFile.showOpenDialog(primaryStage);
+            if (file != null) {
+                try {
+                    InputStream io = new FileInputStream(file);
+                    Image img = new Image(io);
+                    gc.drawImage(img, 0, 0);
+                } catch (IOException ex) {
+                    System.out.println("Error!");
+                }
+            }
+        });
+
+        saveButton.setOnAction((e)->{
+            FileChooser savefile = new FileChooser();
+            savefile.setTitle("Save File");
+
+            File file = savefile.showSaveDialog(primaryStage);
+            if (file != null) {
+                try {
+                    WritableImage writableImage = new WritableImage(800, 740);
+                    drawingArea.snapshot(null, writableImage);
+                    RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+                    ImageIO.write(renderedImage, "png", file);
+                } catch (IOException ex) {
+                    System.out.println("Error!");
+                }
+            }
+        });
 
         BorderPane pane = new BorderPane();
         pane.setBottom(tileButtons);
@@ -123,7 +154,7 @@ public class Main extends Application {
         pane.setRight(rightLine);
         pane.setCenter(drawingBackground);
 
-        Scene scene = new Scene(pane, 800, 600);
+        Scene scene = new Scene(pane, 1000, 810);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
