@@ -28,12 +28,12 @@ public class Main extends Application {
 
         ToggleButton drawButton = new ToggleButton();
         drawButton.setText("Draw");
-        drawButton.setMinSize(240, 20);
+        drawButton.setMinSize(185, 20);
         drawButton.setSelected(true);
 
         ToggleButton eraserButton = new ToggleButton();
         eraserButton.setText("Eraser");
-        eraserButton.setMinSize(240, 20);
+        eraserButton.setMinSize(185, 20);
 
         Button clearButton = new Button();
         clearButton.setText("Clear");
@@ -52,42 +52,59 @@ public class Main extends Application {
         eraserButton.setToggleGroup(selectedButtons);
 
         ColorPicker lineColor = new ColorPicker(Color.BLACK);
+        ColorPicker backgroundColor = new ColorPicker(Color.WHITE);
 
         Canvas drawingArea = new Canvas(800, 720);
         GraphicsContext gc = drawingArea.getGraphicsContext2D();
-        gc.setLineWidth(5);
+        gc.setLineWidth(2);
 
         AtomicReference<StackPane> drawingBackground = new AtomicReference<>(new StackPane(drawingArea));
-        BackgroundFill drawingAreaBackground = new BackgroundFill(Color.WHITE,
+        BackgroundFill drawingAreaBackground = new BackgroundFill(backgroundColor.getValue(),
                 new CornerRadii(0), new Insets(0));
         drawingBackground.get().setBackground(new Background(drawingAreaBackground));
         drawingArea.setOnMousePressed(e->{
             if (eraserButton.isSelected()) {
-                lineColor.setValue(Color.WHITE);
-            }
+                gc.setLineWidth(10);
+                gc.setStroke(backgroundColor.getValue());
+            } else {
+                gc.setLineWidth(2);
                 gc.setStroke(lineColor.getValue());
                 gc.beginPath();
                 gc.lineTo(e.getX(), e.getY());
+            }
         });
 
         drawingArea.setOnMouseDragged(e->{
             if (eraserButton.isSelected()) {
-                lineColor.setValue(Color.WHITE);
-            }
+                gc.setLineWidth(10);
+                gc.setStroke(backgroundColor.getValue());
+            } else {
+                gc.setLineWidth(2);
                 gc.setStroke(lineColor.getValue());
                 gc.lineTo(e.getX(), e.getY());
                 gc.stroke();
+            }
         });
 
         drawingArea.setOnMouseReleased(e->{
             if (eraserButton.isSelected()) {
-                lineColor.setValue(Color.WHITE);
-            }
+                gc.setLineWidth(10);
+                gc.setStroke(backgroundColor.getValue());
+            } else {
+                gc.setLineWidth(2);
                 gc.setStroke(lineColor.getValue());
                 gc.lineTo(e.getX(), e.getY());
                 gc.stroke();
                 gc.closePath();
+            }
             });
+
+        backgroundColor.setOnAction(e->{
+            BackgroundFill drawingAreaBackground_ = new BackgroundFill(backgroundColor.getValue(),
+                    new CornerRadii(0), new Insets(0));
+            drawingBackground.get().setBackground(new Background(drawingAreaBackground_));
+            gc.clearRect(0, 0, 800, 720);
+        });
 
         TilePane tileButtons = new TilePane();
         tileButtons.setPadding(new Insets(10, 100, 10, 100));
@@ -99,9 +116,9 @@ public class Main extends Application {
 
         TilePane paintButtons = new TilePane();
         paintButtons.setPadding(new Insets(10, 100, 10, 100));
-        paintButtons.setHgap(40);
+        paintButtons.setHgap(20);
         paintButtons.setBackground(new Background(backgroundFill));
-        paintButtons.getChildren().addAll(drawButton, eraserButton, lineColor);
+        paintButtons.getChildren().addAll(drawButton, eraserButton, lineColor, backgroundColor);
 
         Pane leftLine = new Pane();
         leftLine.setMinWidth(100);
