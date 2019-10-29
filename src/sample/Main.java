@@ -13,12 +13,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class Main extends Application {
@@ -29,12 +28,12 @@ public class Main extends Application {
 
         ToggleButton drawButton = new ToggleButton();
         drawButton.setText("Draw");
-        drawButton.setMinSize(350, 20);
+        drawButton.setMinSize(240, 20);
         drawButton.setSelected(true);
 
         ToggleButton eraserButton = new ToggleButton();
         eraserButton.setText("Eraser");
-        eraserButton.setMinSize(350, 20);
+        eraserButton.setMinSize(240, 20);
 
         Button clearButton = new Button();
         clearButton.setText("Clear");
@@ -52,50 +51,43 @@ public class Main extends Application {
         drawButton.setToggleGroup(selectedButtons);
         eraserButton.setToggleGroup(selectedButtons);
 
+        ColorPicker lineColor = new ColorPicker(Color.BLACK);
+
         Canvas drawingArea = new Canvas(800, 720);
         GraphicsContext gc = drawingArea.getGraphicsContext2D();
-        gc.setLineWidth(10);
+        gc.setLineWidth(5);
 
-        StackPane drawingBackground = new StackPane(drawingArea);
+        AtomicReference<StackPane> drawingBackground = new AtomicReference<>(new StackPane(drawingArea));
         BackgroundFill drawingAreaBackground = new BackgroundFill(Color.WHITE,
                 new CornerRadii(0), new Insets(0));
-        drawingBackground.setBackground(new Background(drawingAreaBackground));
+        drawingBackground.get().setBackground(new Background(drawingAreaBackground));
         drawingArea.setOnMousePressed(e->{
-            if (drawButton.isSelected()) {
-                gc.setStroke(Color.BLACK);
-                gc.beginPath();
-                gc.lineTo(e.getX(), e.getY());
-            } else if(eraserButton.isSelected()) {
-                gc.setStroke(Color.WHITE);
-                gc.beginPath();
-                gc.lineTo(e.getX(), e.getY());
+            if (eraserButton.isSelected()) {
+                lineColor.setValue(Color.WHITE);
             }
+                gc.setStroke(lineColor.getValue());
+                gc.beginPath();
+                gc.lineTo(e.getX(), e.getY());
         });
 
         drawingArea.setOnMouseDragged(e->{
-            if(drawButton.isSelected()) {
-                gc.setStroke(Color.BLACK);
-                gc.lineTo(e.getX(), e.getY());
-                gc.stroke();
-            } else if(eraserButton.isSelected()) {
-                gc.setStroke(Color.WHITE);
-                gc.lineTo(e.getX(), e.getY());
-                gc.stroke();
+            if (eraserButton.isSelected()) {
+                lineColor.setValue(Color.WHITE);
             }
+                gc.setStroke(lineColor.getValue());
+                gc.lineTo(e.getX(), e.getY());
+                gc.stroke();
         });
 
         drawingArea.setOnMouseReleased(e->{
-            if(drawButton.isSelected()) {
-                gc.setStroke(Color.BLACK);
+            if (eraserButton.isSelected()) {
+                lineColor.setValue(Color.WHITE);
+            }
+                gc.setStroke(lineColor.getValue());
                 gc.lineTo(e.getX(), e.getY());
                 gc.stroke();
                 gc.closePath();
-            } else if(eraserButton.isSelected()) {
-                gc.setStroke(Color.WHITE);
-                gc.lineTo(e.getX(), e.getY());
-                gc.stroke();
-                gc.closePath();
-            }});
+            });
 
         TilePane tileButtons = new TilePane();
         tileButtons.setPadding(new Insets(10, 100, 10, 100));
@@ -107,9 +99,9 @@ public class Main extends Application {
 
         TilePane paintButtons = new TilePane();
         paintButtons.setPadding(new Insets(10, 100, 10, 100));
-        paintButtons.setHgap(100);
+        paintButtons.setHgap(40);
         paintButtons.setBackground(new Background(backgroundFill));
-        paintButtons.getChildren().addAll(drawButton, eraserButton);
+        paintButtons.getChildren().addAll(drawButton, eraserButton, lineColor);
 
         Pane leftLine = new Pane();
         leftLine.setMinWidth(100);
@@ -125,7 +117,6 @@ public class Main extends Application {
         });
 
         openButton.setOnAction((e)->{
-
             FileChooser openFile = new FileChooser();
             openFile.setTitle("Open File");
             File file = openFile.showOpenDialog(primaryStage);
@@ -147,7 +138,7 @@ public class Main extends Application {
             File file = savefile.showSaveDialog(primaryStage);
             if (file != null) {
                 try {
-                    WritableImage writableImage = new WritableImage(800, 740);
+                    WritableImage writableImage = new WritableImage(1080, 790);
                     drawingArea.snapshot(null, writableImage);
                     RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
                     ImageIO.write(renderedImage, "png", file);
@@ -155,6 +146,7 @@ public class Main extends Application {
                     System.out.println("Error!");
                 }
             }
+
         });
 
         BorderPane pane = new BorderPane();
@@ -162,7 +154,7 @@ public class Main extends Application {
         pane.setTop(paintButtons);
         pane.setLeft(leftLine);
         pane.setRight(rightLine);
-        pane.setCenter(drawingBackground);
+        pane.setCenter(drawingBackground.get());
 
         Scene scene = new Scene(pane, 1000, 810);
         primaryStage.setScene(scene);
