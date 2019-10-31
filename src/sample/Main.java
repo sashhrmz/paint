@@ -65,12 +65,9 @@ public class Main extends Application {
         GraphicsContext gc = drawingArea.getGraphicsContext2D();
         gc.setLineWidth(2);
 
-        AtomicReference<StackPane> drawingBackground = new AtomicReference<>(new StackPane(drawingArea));
-        BackgroundFill drawingAreaBackground = new BackgroundFill(backgroundColor.getValue(),
-                new CornerRadii(0), new Insets(0));
-        drawingBackground.get().setBackground(new Background(drawingAreaBackground));
-
-
+        gc.clearRect(0, 0, 800, 720);
+        gc.setFill(backgroundColor.getValue());
+        gc.fillRect(0, 0, 800, 720);
 
         drawingArea.setOnMousePressed(e->{
             double size = Double.parseDouble(textField.getText());
@@ -107,10 +104,9 @@ public class Main extends Application {
             });
 
         backgroundColor.setOnAction(e->{
-            BackgroundFill drawingAreaBackground_ = new BackgroundFill(backgroundColor.getValue(),
-                    new CornerRadii(0), new Insets(0));
-            drawingBackground.get().setBackground(new Background(drawingAreaBackground_));
             gc.clearRect(0, 0, 800, 720);
+            gc.setFill(backgroundColor.getValue());
+            gc.fillRect(0, 0, 800, 720);
         });
 
         TilePane tileButtons = new TilePane();
@@ -162,7 +158,7 @@ public class Main extends Application {
             File file = savefile.showSaveDialog(primaryStage);
             if (file != null) {
                 try {
-                    WritableImage writableImage = new WritableImage(1080, 790);
+                    WritableImage writableImage = new WritableImage(800, 720);
                     drawingArea.snapshot(null, writableImage);
                     RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
                     ImageIO.write(renderedImage, "png", file);
@@ -178,7 +174,7 @@ public class Main extends Application {
         pane.setTop(paintButtons);
         pane.setLeft(leftLine);
         pane.setRight(rightLine);
-        pane.setCenter(drawingBackground.get());
+        pane.setCenter(drawingArea);
 
         Scene scene = new Scene(pane, 1000, 810);
         primaryStage.setScene(scene);
