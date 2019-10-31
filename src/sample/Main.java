@@ -7,13 +7,10 @@ import javafx.scene.control.*;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.FillRule;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.stage.FileChooser;
@@ -141,6 +138,8 @@ public class Main extends Application {
 
         clearButton.setOnAction((e)->{
             gc.clearRect(0, 0, 800, 720);
+            gc.setFill(backgroundColor.getValue());
+            gc.fillRect(0, 0, 800, 720);
         });
 
         openButton.setOnAction((e)->{
