@@ -7,18 +7,21 @@ import javafx.scene.control.*;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.FillRule;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
 import java.io.*;
-import java.util.concurrent.atomic.AtomicReference;
-
 
 public class Main extends Application {
 
@@ -68,6 +71,10 @@ public class Main extends Application {
         gc.clearRect(0, 0, 800, 720);
         gc.setFill(backgroundColor.getValue());
         gc.fillRect(0, 0, 800, 720);
+
+
+        gc.setLineJoin(StrokeLineJoin.ROUND);
+        gc.setLineCap(StrokeLineCap.ROUND);
 
         drawingArea.setOnMousePressed(e->{
             double size = Double.parseDouble(textField.getText());
